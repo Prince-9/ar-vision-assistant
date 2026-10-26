@@ -2,8 +2,7 @@
 
 ## Run the updated backend
 
-From C:\Users\kushw\local-gateway, the Quest tunnel must forward to the backend
-listening on port 8000. Keep Ollama listening locally on port 11434.
+Run `\.\start-gateway.ps1` from this folder. The gateway listens locally on port 8001. Configure the Quest HTTPS tunnel to forward to local port 8001. Keep Ollama listening on port 11434.
 
 MainScene uses the HTTPS backend tunnel at
 https://6z7xkwds-8000.inc1.devtunnels.ms so the Quest can reach the PC backend.
@@ -62,7 +61,7 @@ automatically to the assistant with the current wireless-camera frame.
 There is no transcription-review step and no need to press Send for voice.
 
 Run .\start-gateway.ps1 to keep the gateway running in a separate background
-process on port 8001. The local Whisper model lives in models/faster-whisper-base.
+process on port 8001. The local Whisper model is downloaded separately if needed and is not committed.
 The UI uses higher-resolution world-space text, larger body text and a full-width
 voice status line. Use 1x Game view zoom for a sharp editor preview.
 
@@ -95,3 +94,4 @@ Tests:
 - python -m unittest discover -s tests -v
 - python tests/live_visual_memory.py
 - Unity menu: Tools > AR Vision > Test Session Memory
+
