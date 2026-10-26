@@ -361,3 +361,41 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# Unity generated files
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+.vscode/
+.plastic/
+.utmp/
+
+# Local secrets, credentials, and generated backend artifacts
+.env
+.env.*
+!.env.example
+**/__pycache__/
+*.py[cod]
+.venv/
+venv/
+models/
+output/
+.backups/
+*.log
+*.wav
+*.keystore
+*.jks
+*.p12
+*.csproj
+*.sln
+*.slnx
+Assets/#Meta/
+Assets/_Recovery/
+
+# Unity asset identity files are required for stable references
+!*.meta
