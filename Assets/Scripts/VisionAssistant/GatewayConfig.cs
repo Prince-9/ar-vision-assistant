@@ -29,4 +29,4 @@ public class GatewayConfig : MonoBehaviour
     {
         _instance = this;
     }
-}\n
+}

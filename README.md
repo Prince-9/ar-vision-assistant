@@ -63,4 +63,4 @@ For a Quest headset, build and install the Android/Meta Quest profile. The heads
 - Ask follow-up questions using recent conversation and saved views
 - Use speech input and spoken responses where configured
 
-See [`Backend/README-chat.md`](Backend/README-chat.md) for backend behavior and troubleshooting. Model weights, Unity-generated folders, build outputs, logs, virtual environments, and recordings are intentionally excluded from Git.\n
+See [`Backend/README-chat.md`](Backend/README-chat.md) for backend behavior and troubleshooting. Model weights, Unity-generated folders, build outputs, logs, virtual environments, and recordings are intentionally excluded from Git.
