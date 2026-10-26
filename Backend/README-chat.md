@@ -1,97 +1,30 @@
-# AR chat prototype
+# Backend gateway
 
-## Run the updated backend
+The Unity client sends image questions, OCR scans, speech requests, and conversation-session requests to this FastAPI service. Ollama runs behind the gateway; the headset should call the gateway only.
 
-Run `\.\start-gateway.ps1` from this folder. The gateway listens locally on port 8001. Configure the Quest HTTPS tunnel to forward to local port 8001. Keep Ollama listening on port 11434.
+## Start it
 
-MainScene uses the HTTPS backend tunnel at
-https://6z7xkwds-8000.inc1.devtunnels.ms so the Quest can reach the PC backend.
-Unity sends chat, OCR, voice and session requests to that backend. The backend
-calls Ollama itself; when both run on this PC it uses http://127.0.0.1:11434.
-The Ollama tunnel (https://6z7xkwds-11434.inc1.devtunnels.ms) is for server-side
-Ollama access when needed, and should not be called directly by the Unity app.
-Moondream must be available in the Ollama service.
+From this folder, create the virtual environment and install dependencies as described in the repository-root README, then run:
 
-## Unity
+```powershell
+.\start-gateway.ps1
+```
 
-Open Assets/Scenes/MainScene.unity and press Play.
+The script listens on `127.0.0.1:8001`. Confirm startup with `Invoke-RestMethod http://127.0.0.1:8001/health`.
 
-- Send captures the current camera view and asks Moondream.
-- General image questions use the current frame to describe scenes, objects,
-  actions, spatial relationships, diagrams, and clearly visible details.
-- Scan Text captures the view and runs Tesseract through /ocr.
-- Follow-up questions include recent successful exchanges and scanned text.
-- Clear chat clears both displayed messages and model context.
-- Memory lasts for the current Play session only. It keeps up to three recent
-  exchanges within 5000 characters, truncating individual entries to 1500.
-- The panel shows progress and disables Send/Scan/Clear during a request.
-- Microphone uses the existing Windows dictation implementation.
+The gateway expects Ollama at `http://127.0.0.1:11434` unless `OLLAMA_URL` points to another `/api/chat` endpoint. It uses `moondream` for image questions and `qwen3.5:9b` for text-only requests. Pull both models with Ollama before asking questions. Tesseract must be installed and discoverable on `PATH` for OCR.
 
-The panel is a world-space Unity canvas. Headset passthrough and XR hand/controller
-input still require separate integration.
+## Connect Unity
 
-## OCR
+Set the scene's `GatewayConfig.BaseUrl` to the backend URL. Use `http://127.0.0.1:8001` for Unity Editor on the same PC. For Quest, use the HTTPS address from a tunnel configured to forward to local port `8001`; `127.0.0.1` on the headset refers to the headset itself.
 
-Tesseract was installed using the UB-Mannheim Windows package.
-The service discovers tesseract.exe on PATH or in Program Files/Tesseract-OCR.
-TESSERACT_CMD can explicitly configure its path.
+## Conversation memory
 
-## Checks
+Each chat session keeps up to 12 compressed camera views in memory, with descriptions and OCR text. It retains recent exchanges and bounded notes from older ones. Memory lasts until Clear chat, leaving Play mode, gateway restart, or the two-hour inactivity expiry. Camera snapshots are not written to disk by session memory.
 
-    .\venv\Scripts\python.exe -m unittest discover -s tests -v
+Show an object and ask about it to save a view. Then ask a follow-up such as “What book did I show you earlier?” Clear chat deletes the session. This is bounded prototype memory; model descriptions can be wrong, and repeated views are not guaranteed to be recognized as the same physical object.
 
-Unity: Tools > AR Vision > Test Chat Integration.
-This uses a generated poster fixture, checks camera capture and scene bindings,
-checks memory and Clear chat, and calls the real OCR and Moondream services.
-Results go to tests/unity-smoke-result.txt.
+## OCR and speech
 
-Moondream's installed single-question template receives recent text context
-inside the current prompt. The model may still miss context or misread details.
-OCR text is displayed directly, without rewriting it through the model.
-
-Tools > AR Vision > Polish Chat Panel reapplies the saved panel design.
-Backups of the original scripts and scene are in .backups/chat-v1-*.
-
-## Voice input update
-
-The Microphone button records only Microphone Array (Realtek(R) Audio).
-Click once to record and again to finish (maximum 29 seconds).
-Speech recognition runs locally inside the gateway, then the question is sent
-automatically to the assistant with the current wireless-camera frame.
-There is no transcription-review step and no need to press Send for voice.
-
-Run .\start-gateway.ps1 to keep the gateway running in a separate background
-process on port 8001. The local Whisper model is downloaded separately if needed and is not committed.
-The UI uses higher-resolution world-space text, larger body text and a full-width
-voice status line. Use 1x Game view zoom for a sharp editor preview.
-
-## Visual conversation memory
-
-Chat now sends a unique session ID with questions and text scans. The gateway
-keeps up to 12 compressed camera views in RAM, with descriptions and OCR text.
-It also retains the last exchanges and bounded extractive notes from older ones.
-No user camera snapshots are written to disk by this feature.
-
-Show an object and ask about it to save a view. Looking at something silently
-does not save it. Say "What book did I show you earlier?" to recall the book,
-or "Read its title again" to use the saved OCR. Ask "What is around me now?"
-to explicitly use the live camera instead. If several saved views match,
-reply with the view number shown in chat. Repeated captures may represent the
-same physical object as separate views; this version does not track objects.
-
-Clear chat waits for the gateway to delete the session, then starts a new one.
-Scene exit sends best-effort cleanup. If the app exits abruptly or the gateway
-cannot be reached, abandoned sessions expire after two hours of inactivity,
-checked once per minute. A gateway restart clears all sessions. The store is
-bounded to 16 sessions. The oldest images/notes are evicted as limits are reached.
-
-References use explicit words, object labels and recent focus. This is a
-bounded prototype, not unlimited or perfect recall. Earlier model descriptions
-can be wrong; extracted text and saved images remain available for checking.
-A Moondream empty answer receives one labeled description fallback.
-
-Tests:
-- python -m unittest discover -s tests -v
-- python tests/live_visual_memory.py
-- Unity menu: Tools > AR Vision > Test Session Memory
+Scan Text uses Tesseract and returns extracted text directly. Microphone input runs speech recognition through the gateway and sends the recognized question automatically. A local Whisper model may be downloaded on first use; model weights and recordings are not included in Git.
 
