@@ -52,7 +52,7 @@ By default, the gateway calls Ollama at `http://127.0.0.1:11434`. To use a diffe
 1. Clone this repository and open its root folder in Unity Hub.
 2. Let Unity resolve the packages listed in `Packages/manifest.json`.
 3. Open `Assets/Scenes/MainScene.unity` and press **Play** to test in the Editor. The Editor uses the selected PC webcam.
-4. In the scene's `GatewayConfig`, set `BaseUrl` to the backend address. For local Editor testing, use `http://127.0.0.1:8001`.
+4. Press **Play**. In the Unity Editor the app automatically uses the local gateway at `http://127.0.0.1:8001`.
 
 For a Quest headset, build and install the Android/Meta Quest profile. The headset cannot use the PC's `127.0.0.1`; expose the gateway at an HTTPS address reachable by the Quest (for example, a dev tunnel forwarding to local port **8001**) and set `GatewayConfig.BaseUrl` to that public backend URL. Keep Ollama behind the gateway; the Unity app should call only the backend. Grant camera and microphone access when prompted.
 
@@ -63,4 +63,4 @@ For a Quest headset, build and install the Android/Meta Quest profile. The heads
 - Ask follow-up questions using recent conversation and saved views
 - Use speech input and spoken responses where configured
 
-See [`Backend/README-chat.md`](Backend/README-chat.md) for backend behavior and troubleshooting. Model weights, Unity-generated folders, build outputs, logs, virtual environments, and recordings are intentionally excluded from Git.
+See [`Backend/README-chat.md`](Backend/README-chat.md) for backend behavior and troubleshooting. Model weights, Unity-generated folders, build outputs, logs, virtual environments, and recordings are intentionally excluded from Git.\n
